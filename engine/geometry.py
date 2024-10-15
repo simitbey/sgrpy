@@ -168,30 +168,23 @@ class Display:
     def __init__(self, width, height):
         self.width = width
         self.height = height
+        self.focal_length = 200
+        self.perspective_enabled = True
 
     def to_screen(self, point):
         return int(point.x + self.width / 2), int(self.height / 2 - point.y)
 
-    def rotate_x(self, point, angle):
-        rad = math.radians(angle)
-        y = point.y * math.cos(rad) - point.z * math.sin(rad)
-        z = point.y * math.sin(rad) + point.z * math.cos(rad)
-        return Point3D(point.x, y, z)
-
-    def rotate_y(self, point, angle):
-        rad = math.radians(angle)
-        x = point.x * math.cos(rad) + point.z * math.sin(rad)
-        z = -point.x * math.sin(rad) + point.z * math.cos(rad)
-        return Point3D(x, point.y, z)
-
-    def rotate_z(self, point, angle):
-        rad = math.radians(angle)
-        x = point.x * math.cos(rad) - point.y * math.sin(rad)
-        y = point.x * math.sin(rad) + point.y * math.cos(rad)
-        return Point3D(x, y, point.z)
-
     def project_3d_to_2d(self, point3d):
-        factor = 200 / (point3d.z + 200)
+        if self.perspective_enabled:
+            factor = self.focal_length / (point3d.z + self.focal_length)
+        else:
+            factor = 1
         x = point3d.x * factor
         y = point3d.y * factor
         return Vertices(x, y)
+
+    def adjust_focal_length(self, amount):
+        self.focal_length += amount
+
+    def toggle_perspective(self):
+        self.perspective_enabled = not self.perspective_enabled
