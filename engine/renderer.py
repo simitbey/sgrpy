@@ -34,8 +34,11 @@ class STF:
                 elif line.startswith('struct'):
                     struct_content = line[line.index('(') + 1:line.index(')')]
                     for segment in struct_content.split('/'):
-                        connection = [int(x) for x in segment.split('>')]
-                        current_connections.append(connection)
+                        # Skip empty segments
+                        if segment:
+                            connection = [int(x) for x in segment.split('>') if x]
+                            if connection:
+                                current_connections.append(connection)
                 elif '[' in line and ']' in line:
                     point_id, coords = line.split('[')
                     point_id = int(point_id)
@@ -327,11 +330,22 @@ class Renderer:
         x, y = position
         for char in text:
             self.render_character(char, (x, y))
-            x += self.font.font_size * 3
+            x += self.font.font_size * 0.8
 
     def get_debug_info(self):
         return [
-            "1 2 3 4 5",
+            f"FPS: {self.clock.get_fps():.2f}",
+            f"Rendering: {self.rendering_algorithm}",
+            f"Rotation: X:{self.transformer.rotation_angles['x']:.2f} Y:{self.transformer.rotation_angles['y']:.2f} Z:{self.transformer.rotation_angles['z']:.2f}",
+            f"Focal Length: {self.display.focal_length}",
+            f"Perspective: {'On' if self.display.perspective_enabled else 'Off'}",
+            f"Objects: {len(self.objects)}",
+            f"Spinning: {'Yes' if self.spinning else 'No'}",
+            f"Window Size: {self.width}x{self.height}",
+            "Controls:",
+            "Space: Toggle spin | Arrows: Rotate | Q/E: Z-rotation",
+            "W/S: Focal length | P: Toggle perspective",
+            "1-6: Change rendering algorithm"
         ]
 
     def render_pixels(self):
@@ -353,7 +367,7 @@ class Renderer:
 
         debug_info = self.get_debug_info()
         for i, line in enumerate(debug_info):
-            self.render_text(line, (10, 10 + i * self.font.font_size * 2))
+            self.render_text(line, (10, 10 + i * self.font.font_size * 1.5))
 
         pygame.display.flip()
 
@@ -409,8 +423,8 @@ class Renderer:
         pygame.quit()
 
 if __name__ == '__main__':
-    renderer = Renderer(1280, 800, 'engine/assets/converted.stf', font_size=10)
-    cube1 = ShapeFactory.create_cube(Point3D(0, 0, 0), 60)
+    renderer = Renderer(2500, 1380, 'engine/assets/converted.stf', font_size=10)
+    cube1 = ShapeFactory.create_cube(Point3D(0, 0, 0), 540)
     stf = STF('engine/assets/converted.stf', 5)
     stf.debug_print()
     renderer.add_object(cube1)
