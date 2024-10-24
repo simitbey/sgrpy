@@ -12,3 +12,7 @@
 
 * 3D graphics rendering using triangle based computer graphics, mapping of 3d space into 2d forms for display purposes, and line generation algorithms that help generate lines that connect vertices.
 * Custom made font file and a converter from TTF to a custom font file technllogy, ( I dont know why I did this )
+
+## Usecases
+
+* Wow cool visuals omg spinning cube
